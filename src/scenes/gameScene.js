@@ -186,6 +186,7 @@ export function GameScene(sceneManager, nextScene, canvas) {
         },
 
         checkCollision(a, b) {
+            // return false
             return (
                 a.x < b.x + b.width &&
                 a.x + a.width > b.x &&
