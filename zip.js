@@ -36,7 +36,7 @@ async function createZip() {
     if (file.endsWith('.png')) {
       const inputPath = path.join('dist', file);
       const buffer = await sharp(inputPath)
-        .png({ compressionLevel: 10, quality: 30 }) // maximale Kompression, gute Qualität
+        .png({ compressionLevel: 9, quality: 30 }) // maximale Kompression, gute Qualität
         .toBuffer();
       archive.append(buffer, { name: file });
     }

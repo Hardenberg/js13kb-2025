@@ -83,11 +83,14 @@ export function GameScene(sceneManager, nextScene, canvas) {
                 }, 1000); 
             }, 'up')
             onKey('esc', () => {
+                console.log('Escape gedrückt, gehe zum Menü');
                 sceneManager.show('menu');
             }, 'down');
         },
 
         update() {
+            console.log('GameScene update');
+            
             let inputX = 0;
             let inputY = 0;
 
@@ -109,8 +112,8 @@ export function GameScene(sceneManager, nextScene, canvas) {
             
             cat.update(inputX, inputY, canvas);
             mice.forEach((mouse, index) => {
-                mouse.update(canvas, cat.sprite);
-                if (this.checkCollision(cat.sprite, mouse.sprite)) {
+                mouse.update(canvas, cat);
+                if (this.checkCollision(cat, mouse)) {
                     if(showCircle){
                         score++;
                         mice.splice(index, 1);
@@ -123,11 +126,15 @@ export function GameScene(sceneManager, nextScene, canvas) {
                         }, 2000)
                     }
                     if (health <= 0) {
+                        console.log('Game Over');
                         sceneManager.show('menu');
                         return;
                     }  
                 }
             });
+            if (mice.length <1) {
+                sceneManager.show('menu');
+            }
             
         },
 
@@ -156,8 +163,8 @@ export function GameScene(sceneManager, nextScene, canvas) {
             });
         
             // Game-Objekte
-            cat.render();
-            mice.forEach(mouse => mouse.render());
+            cat.render(ctx);
+            mice.forEach(mouse => mouse.render(ctx));
         
             // UI
             ctx.fillStyle = 'white';
@@ -173,8 +180,8 @@ export function GameScene(sceneManager, nextScene, canvas) {
             if (showCircle) {
                 ctx.beginPath();
                 ctx.arc(
-                    cat.sprite.x + cat.sprite.width / 2,
-                    cat.sprite.y + cat.sprite.height / 2,
+                    cat.x + cat.width / 2,
+                    cat.y + cat.height / 2,
                     44,
                     0,
                     Math.PI * 2
@@ -186,6 +193,7 @@ export function GameScene(sceneManager, nextScene, canvas) {
         },
 
         checkCollision(a, b) {
+            
             // return false
             return (
                 a.x < b.x + b.width &&
