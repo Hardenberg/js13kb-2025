@@ -102,60 +102,59 @@ export class Mouse {
     render(ctx) {
         if (!ctx) return;
 
-        // Körper (schlank)
-        ctx.fillStyle = 'gray';
+        ctx.fillStyle='#0d0d0d'; 
         ctx.beginPath();
-        ctx.ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+        ctx.ellipse(this.x+this.width/2,this.y+this.height/2,this.width/2,this.height/2,0,0,Math.PI*2); 
         ctx.fill();
 
-        // Kopf (abgerundet vorne)
+        // Kopf
         ctx.beginPath();
-        ctx.arc(this.x + this.width + 3, this.y + this.height / 2, this.height / 2, 0, Math.PI * 2);
+        ctx.arc(this.x+this.width+3,this.y+this.height/2,this.height/2,0,Math.PI*2); 
         ctx.fill();
 
         // Ohren
-        ctx.fillStyle = 'darkgray';
-        ctx.beginPath();
-        ctx.arc(this.x + this.width, this.y + 3, 3, 0, Math.PI * 2);
+        ctx.fillStyle='#0d0d0d';
+        ctx.beginPath(); 
+        ctx.arc(this.x+this.width,this.y+3,3,0,Math.PI*2); 
         ctx.fill();
-        ctx.beginPath();
-        ctx.arc(this.x + this.width, this.y + this.height - 3, 3, 0, Math.PI * 2);
+        ctx.beginPath(); 
+        ctx.arc(this.x+this.width,this.y+this.height-3,3,0,Math.PI*2); 
         ctx.fill();
 
-        // Augen
-        ctx.fillStyle = 'black';
-        ctx.beginPath();
-        ctx.arc(this.x + this.width + 3, this.y + this.height / 2, 1.5, 0, Math.PI * 2);
+        // Augen glühend
+        ctx.fillStyle='rgba(255,200,50,0.9)';
+        ctx.beginPath(); 
+        ctx.arc(this.x+this.width+3,this.y+this.height/2,2,0,Math.PI*2); 
         ctx.fill();
 
         // Beine
-        ctx.strokeStyle = 'darkgray';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle='#222'; 
+        ctx.lineWidth=1.5; 
         ctx.beginPath();
-        ctx.moveTo(this.x + 4, this.y + this.height - 1);
-        ctx.lineTo(this.x + 4, this.y + this.height + 4);
-        ctx.moveTo(this.x + 10, this.y + this.height - 1);
-        ctx.lineTo(this.x + 10, this.y + this.height + 4);
-        ctx.moveTo(this.x + 16, this.y + this.height - 1);
-        ctx.lineTo(this.x + 16, this.y + this.height + 4);
+        ctx.moveTo(this.x+4,this.y+this.height-1); 
+        ctx.lineTo(this.x+4,this.y+this.height+4);
+        ctx.moveTo(this.x+10,this.y+this.height-1); 
+        ctx.lineTo(this.x+10,this.y+this.height+4);
+        ctx.moveTo(this.x+16,this.y+this.height-1); 
+        ctx.lineTo(this.x+16,this.y+this.height+4); 
         ctx.stroke();
 
-        // Schwanz
-        ctx.strokeStyle = 'pink';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y + this.height / 2);
-        ctx.quadraticCurveTo(this.x - 12, this.y + this.height / 2 - 4, this.x - 8, this.y + this.height / 2 - 12);
+        // Schwanz gespenstisch
+        ctx.strokeStyle='#0d0d0d'; 
+        ctx.lineWidth=2;
+        ctx.beginPath(); 
+        ctx.moveTo(this.x,this.y+this.height/2);
+        ctx.quadraticCurveTo(this.x-12,this.y+this.height/2-4,this.x-8,this.y+this.height/2-12); 
         ctx.stroke();
 
-        // Schnurrhaare
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 0.8;
+        // Schnurrhaare leicht transparent
+        ctx.strokeStyle='rgba(200,200,200,0.5)'; 
+        ctx.lineWidth=0.8;
         ctx.beginPath();
-        ctx.moveTo(this.x + this.width + 4, this.y + this.height / 2);
-        ctx.lineTo(this.x + this.width + 10, this.y + this.height / 2 - 2);
-        ctx.moveTo(this.x + this.width + 4, this.y + this.height / 2);
-        ctx.lineTo(this.x + this.width + 10, this.y + this.height / 2 + 2);
+        ctx.moveTo(this.x+this.width+4,this.y+this.height/2);
+        ctx.lineTo(this.x+this.width+10,this.y+this.height/2-2);
+        ctx.moveTo(this.x+this.width+4,this.y+this.height/2);
+        ctx.lineTo(this.x+this.width+10,this.y+this.height/2+2);
         ctx.stroke();
     }
   }

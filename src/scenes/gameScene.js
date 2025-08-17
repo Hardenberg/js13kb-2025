@@ -18,41 +18,27 @@ export function GameScene(sceneManager, nextScene, canvas) {
     let caveTiles = [];
 
 
-    for (let y = 0; y < canvas.height; y += tileSize) {
-        caveTiles[y] = [];
-        for (let x = 0; x < canvas.width; x += tileSize) {
-            let isWall = (
-                y === 0 ||
-                y >= canvas.height - tileSize ||
-                x === 0 ||
-                x >= canvas.width - tileSize
-            );
-    
-            if (isWall) {
-                caveTiles[y].push({
-                    x,
-                    y,
-                    isWall: true,
-                    color: '#1a1a1a',
-                    spots: []
-                });
+    for(let y=0;y<canvas.height;y+=tileSize){
+        caveTiles[y]=[];
+        for(let x=0;x<canvas.width;x+=tileSize){
+            const isWall=y===0||y>=canvas.height-tileSize||x===0||x>=canvas.width-tileSize;
+            if(isWall){
+                caveTiles[y].push({x,y,isWall:true,color:'#0a0a0a',spots:[]});
             } else {
-                const colors = ['#2b2b2b', '#353535', '#3d3d3d', '#292929'];
-                let color = colors[Math.floor(Math.random() * colors.length)];
-    
-                let spots = [];
-                for (let i = 0; i < 3; i++) {
-                    spots.push({
-                        x: Math.random() * tileSize,
-                        y: Math.random() * tileSize,
-                        r: Math.random() * 3
-                    });
-                }
-    
-                caveTiles[y].push({ x, y, isWall: false, color, spots });
+                const colors=['#1f1f1f','#222222','#1c1c1c','#202020']; // düsteres Grau
+                const color=colors[Math.floor(Math.random()*colors.length)];
+                const spots=Array.from({length:3},()=>({
+                    x:Math.random()*tileSize,
+                    y:Math.random()*tileSize,
+                    r:Math.random()*3,
+                    color:'rgba(50,50,50,0.6)' // dunkle Spots ohne Rot
+                }));
+                caveTiles[y].push({x,y,isWall:false,color,spots});
             }
         }
     }
+    
+    
 
     function spawnMouse() {
         let randX = Math.random() * (canvas.width - 20);
