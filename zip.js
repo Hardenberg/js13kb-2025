@@ -1,48 +1,91 @@
 import fs from 'fs';
-import archiver from 'archiver';
-import { minify } from 'html-minifier-terser';
 import path from 'path';
+import archiver from 'archiver';
 import sharp from 'sharp';
+import { minify as minifyHTML } from 'html-minifier-terser';
+import { minify as minifyJS } from 'terser';
+
+const MAX_SIZE = 13312; // 13 KB
+const MIN_PNG_QUALITY = 10; // don’t go below 10% quality
 
 async function createZip() {
-  const output = fs.createWriteStream('game.zip');
-  const archive = archiver('zip', { zlib: { level: 9 } });
+  let pngQuality = 30; // starting PNG quality
 
-  output.on('close', () => {
-    console.log(`ZIP erstellt: ${archive.pointer()} ≤ 13,312 bytes`);
-  });
+  async function buildZip() {
+    const output = fs.createWriteStream('game.zip');
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.pipe(output);
 
-  archive.on('error', err => { throw err; });
-  archive.pipe(output);
+    archive.on('error', err => { throw err; });
 
-  const html = fs.readFileSync('dist/index.html', 'utf8');
-  const minifiedHTML = await minify(html, {
-    collapseWhitespace: true,
-    removeComments: true,
-    removeRedundantAttributes: true,
-    removeEmptyAttributes: true,
-    minifyCSS: true,
-    minifyJS: true
-  });
-  fs.writeFileSync('dist/index.min.html', minifiedHTML);
-  archive.file('dist/index.min.html', { name: 'index.html' });
+    // ----------------------
+    // HTML
+    // ----------------------
+    const html = fs.readFileSync('dist/index.html', 'utf8');
+    const minifiedHTML = await minifyHTML(html, {
+      collapseWhitespace: true,
+      removeComments: true,
+      removeRedundantAttributes: true,
+      removeEmptyAttributes: true,
+      minifyCSS: true,
+      minifyJS: true
+    });
+    archive.append(minifiedHTML, { name: 'index.html' });
 
-  
-  // JS hinzufügen (optional vorher mit Terser minifizieren)
-  archive.file('dist/bundle.js', { name: 'bundle.js' });
+    // ----------------------
+    // JS
+    // ----------------------
+    const jsCode = fs.readFileSync('dist/bundle.js', 'utf8');
+    const minifiedJS = await minifyJS(jsCode, {
+      compress: { drop_console: true, drop_debugger: true, passes: 3, unsafe: true, unsafe_arrows: true, toplevel: true },
+      mangle: { toplevel: true },
+      format: { comments: false }
+    });
+    archive.append(minifiedJS.code, { name: 'bundle.js' });
 
-  const files = fs.readdirSync('dist');
-  for (const file of files) {
-    if (file.endsWith('.png')) {
-      const inputPath = path.join('dist', file);
-      const buffer = await sharp(inputPath)
-        .png({ compressionLevel: 9, quality: 30 }) // maximale Kompression, gute Qualität
-        .toBuffer();
-      archive.append(buffer, { name: file });
+    // ----------------------
+    // PNGs
+    // ----------------------
+    const files = fs.readdirSync('dist');
+    for (const file of files) {
+      if (file.endsWith('.png')) {
+        const inputPath = path.join('dist', file);
+        archive.append(
+          await sharp(inputPath)
+            .png({ compressionLevel: 9, quality: pngQuality })
+            .toBuffer(),
+          { name: file }
+        );
+      }
     }
+
+    await archive.finalize();
+
+    return new Promise(resolve => {
+      output.on('close', () => {
+        const bytesUsed = archive.pointer();
+        resolve(bytesUsed);
+      });
+    });
   }
 
-  await archive.finalize();
+  // ----------------------
+  // Try building until under limit
+  // ----------------------
+  let bytesUsed = await buildZip();
+  while (bytesUsed > MAX_SIZE && pngQuality > MIN_PNG_QUALITY) {
+    console.log(`⚠️ ZIP too large (${bytesUsed} bytes). Reducing PNG quality: ${pngQuality} -> ${pngQuality - 5}`);
+    pngQuality -= 5;
+    bytesUsed = await buildZip();
+  }
+
+  const percentUsed = (bytesUsed / MAX_SIZE * 100).toFixed(2);
+  console.log(`✅ ZIP finalized: ${bytesUsed} bytes (${percentUsed}% of limit, PNG quality: ${pngQuality}%)`);
+
+  if (bytesUsed > MAX_SIZE) {
+    console.warn(`⚠️ Could not fit ZIP under ${MAX_SIZE} bytes, consider removing files.`);
+  }
 }
 
-createZip().catch(console.error);
+// Run
+createZip().catch(err => console.error('❌ Error creating ZIP:', err));

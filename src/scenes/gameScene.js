@@ -86,6 +86,13 @@ export function GameScene(sceneManager, nextScene, canvas) {
                 console.log('Escape gedrückt, gehe zum Menü');
                 sceneManager.show('menu');
             }, 'down');
+            onKey('m', () => {
+                setTimeout(() => {
+                    console.log('Quick-GameOVer');
+                    sceneManager.show('gameover');
+                }
+                , 1000);
+            });
         },
 
         update() {
@@ -127,7 +134,7 @@ export function GameScene(sceneManager, nextScene, canvas) {
                     }
                     if (health <= 0) {
                         console.log('Game Over');
-                        sceneManager.show('menu');
+                        sceneManager.show('gameover');
                         return;
                     }  
                 }
